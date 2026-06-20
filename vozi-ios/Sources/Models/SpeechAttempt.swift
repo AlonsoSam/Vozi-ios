@@ -32,6 +32,10 @@ final class SpeechAttempt {
     var onDevice: Bool                // true si el reconocimiento fue local
     var childAgeBand: String          // "4-5" / "6-7"
 
+    /// Perfil de niño asociado (Fase 1). Opcional: los intentos del spike de
+    /// Fase 0 no tienen perfil. La inversa se declara en `ChildProfile.attempts`.
+    var child: ChildProfile?
+
     init(
         targetPhoneme: String,
         targetWord: String,

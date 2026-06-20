@@ -9,7 +9,12 @@ struct VoziIOSApp: App {
         WindowGroup {
             RootView()
         }
-        // SwiftData: persistencia local de los intentos de prueba.
-        .modelContainer(for: SpeechAttempt.self)
+        // SwiftData: persistencia local (Fase 0 intentos + Fase 1 perfiles/progreso).
+        .modelContainer(for: [
+            ChildProfile.self,
+            PhonemeProgress.self,
+            StageProgress.self,
+            SpeechAttempt.self,
+        ])
     }
 }

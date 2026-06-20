@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Pantalla de inicio + consentimiento del adulto.
+/// Pantalla de inicio + consentimiento del adulto (spec §6, §7).
+/// El adulto autoriza micrófono y reconocimiento de voz antes de practicar.
 struct PermissionsView: View {
     @Binding var authorized: Bool?
     let denied: Bool
@@ -8,18 +9,18 @@ struct PermissionsView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Image(systemName: "mic.circle.fill")
+            Image(systemName: "waveform.circle.fill")
                 .font(.system(size: 72))
                 .foregroundStyle(.tint)
 
-            Text("VOZI · Validación de voz")
-                .font(.title2.bold())
+            Text("VOZI")
+                .font(.largeTitle.bold())
 
-            Text("Fase 0 — Spike de Speech-to-Text")
+            Text("Práctica y refuerzo de pronunciación")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Text("Herramienta operada por un adulto para probar el reconocimiento de voz en niños de 4 a 7 años. El audio se procesa en el dispositivo; VOZI no almacena ni sube el audio, solo el texto aproximado y métricas.")
+            Text("Experiencia educativa para niños de 4 a 7 años. La práctica usa el micrófono para apoyar el refuerzo de fonemas. El audio se procesa en el dispositivo; VOZI no almacena ni sube el audio, solo el texto aproximado y el progreso.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
