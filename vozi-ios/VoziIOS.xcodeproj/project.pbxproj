@@ -1,0 +1,404 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		20D75C02FED18D572E8C5C0C /* SpeechAttempt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F62077B29D170A64E449409 /* SpeechAttempt.swift */; };
+		4F97DAF722C4058471087E7C /* SpeechSpikeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5504F9D6E3B0D512E2A843CC /* SpeechSpikeView.swift */; };
+		51F6F583629D9CDB64D2EF6C /* SpeechSpikeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9A2E6E266ED72A25BF53F /* SpeechSpikeViewModel.swift */; };
+		56DF3C6725CA7ADDA79836FC /* PromptBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BDD6FC726D6E9B82152D32F /* PromptBank.swift */; };
+		5A254BC616E31D9803C3D587 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F7C8BE0897787713635ED4D /* RootView.swift */; };
+		64AFE69D051961A8AE1FBF66 /* ApproximateMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04A297A85053B565C698EDC7 /* ApproximateMatcher.swift */; };
+		8DD68F5FCD3A2834874AD326 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6420030859805CCA81BB6C3 /* SpeechRecognitionService.swift */; };
+		90B75AB0CC7895798A62AFDA /* SpeechAuthorization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08012538C0215F80FD7FA2D4 /* SpeechAuthorization.swift */; };
+		AFCA26AE30B6A1B466E4DD88 /* PermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 555B09F0BCFF226735CF9A2A /* PermissionsView.swift */; };
+		B3A729E94904C778CE1EDA61 /* VoziIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 563A09B9AE28A1EDE8D68956 /* VoziIOSApp.swift */; };
+		B9B9C63865CD7FFD8FDC4B37 /* TestPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1323E7742263A74141864E80 /* TestPrompt.swift */; };
+		C602E78DEA05DFA0B974D38F /* SupportedLocales.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54F1F367213AA72383CB170 /* SupportedLocales.swift */; };
+		EF15AAADC35815FEAC9C8E62 /* ResultsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BCF02F0A1CE03BC87E781A /* ResultsListView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		04A297A85053B565C698EDC7 /* ApproximateMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApproximateMatcher.swift; sourceTree = "<group>"; };
+		08012538C0215F80FD7FA2D4 /* SpeechAuthorization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAuthorization.swift; sourceTree = "<group>"; };
+		0BDD6FC726D6E9B82152D32F /* PromptBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBank.swift; sourceTree = "<group>"; };
+		0F7C8BE0897787713635ED4D /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		1323E7742263A74141864E80 /* TestPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPrompt.swift; sourceTree = "<group>"; };
+		5504F9D6E3B0D512E2A843CC /* SpeechSpikeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSpikeView.swift; sourceTree = "<group>"; };
+		555B09F0BCFF226735CF9A2A /* PermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsView.swift; sourceTree = "<group>"; };
+		563A09B9AE28A1EDE8D68956 /* VoziIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoziIOSApp.swift; sourceTree = "<group>"; };
+		59932B1A16DB00BD4E3C1F43 /* VoziIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VoziIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F62077B29D170A64E449409 /* SpeechAttempt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechAttempt.swift; sourceTree = "<group>"; };
+		B6420030859805CCA81BB6C3 /* SpeechRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRecognitionService.swift; sourceTree = "<group>"; };
+		B6F9A2E6E266ED72A25BF53F /* SpeechSpikeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSpikeViewModel.swift; sourceTree = "<group>"; };
+		C54F1F367213AA72383CB170 /* SupportedLocales.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLocales.swift; sourceTree = "<group>"; };
+		C9BCF02F0A1CE03BC87E781A /* ResultsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsListView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		32C202B7E026D18FFA62001B /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				48118DEEE93DAA4E3D9B718F /* App */,
+				EC24D2DD5C9516EC0A9D661E /* Features */,
+				E163F354C13DC25DAB052F56 /* Matching */,
+				5C550BF2EA2195BC1B26EFD7 /* Models */,
+				3DCABF35B6A49F677E0E0842 /* Speech */,
+				34B028108883DF9267280D05 /* Support */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		34B028108883DF9267280D05 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				0BDD6FC726D6E9B82152D32F /* PromptBank.swift */,
+				C54F1F367213AA72383CB170 /* SupportedLocales.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		3DCABF35B6A49F677E0E0842 /* Speech */ = {
+			isa = PBXGroup;
+			children = (
+				08012538C0215F80FD7FA2D4 /* SpeechAuthorization.swift */,
+				B6420030859805CCA81BB6C3 /* SpeechRecognitionService.swift */,
+			);
+			path = Speech;
+			sourceTree = "<group>";
+		};
+		40DDF58436C53080CC22A6DE = {
+			isa = PBXGroup;
+			children = (
+				32C202B7E026D18FFA62001B /* Sources */,
+				866B89E986AAE1C8491021AE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		48118DEEE93DAA4E3D9B718F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0F7C8BE0897787713635ED4D /* RootView.swift */,
+				563A09B9AE28A1EDE8D68956 /* VoziIOSApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		5C550BF2EA2195BC1B26EFD7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				9F62077B29D170A64E449409 /* SpeechAttempt.swift */,
+				1323E7742263A74141864E80 /* TestPrompt.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		866B89E986AAE1C8491021AE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				59932B1A16DB00BD4E3C1F43 /* VoziIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D1CB0F10D926FC4EF9D709CA /* SpeechSpike */ = {
+			isa = PBXGroup;
+			children = (
+				C9BCF02F0A1CE03BC87E781A /* ResultsListView.swift */,
+				5504F9D6E3B0D512E2A843CC /* SpeechSpikeView.swift */,
+				B6F9A2E6E266ED72A25BF53F /* SpeechSpikeViewModel.swift */,
+			);
+			path = SpeechSpike;
+			sourceTree = "<group>";
+		};
+		E0A46104B3B4D244E5AA64E9 /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				555B09F0BCFF226735CF9A2A /* PermissionsView.swift */,
+			);
+			path = Permissions;
+			sourceTree = "<group>";
+		};
+		E163F354C13DC25DAB052F56 /* Matching */ = {
+			isa = PBXGroup;
+			children = (
+				04A297A85053B565C698EDC7 /* ApproximateMatcher.swift */,
+			);
+			path = Matching;
+			sourceTree = "<group>";
+		};
+		EC24D2DD5C9516EC0A9D661E /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				E0A46104B3B4D244E5AA64E9 /* Permissions */,
+				D1CB0F10D926FC4EF9D709CA /* SpeechSpike */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5756A016C150F8E5D7F028C6 /* VoziIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 487F5386C9A9EC75DDA2C2BC /* Build configuration list for PBXNativeTarget "VoziIOS" */;
+			buildPhases = (
+				1B786AEB30E7CDE020F10CB7 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VoziIOS;
+			packageProductDependencies = (
+			);
+			productName = VoziIOS;
+			productReference = 59932B1A16DB00BD4E3C1F43 /* VoziIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		69A4695FBFCDE0FD63E04DE1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+			};
+			buildConfigurationList = 51210B24FFECF29C7E78C6B8 /* Build configuration list for PBXProject "VoziIOS" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 40DDF58436C53080CC22A6DE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 866B89E986AAE1C8491021AE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5756A016C150F8E5D7F028C6 /* VoziIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1B786AEB30E7CDE020F10CB7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				64AFE69D051961A8AE1FBF66 /* ApproximateMatcher.swift in Sources */,
+				AFCA26AE30B6A1B466E4DD88 /* PermissionsView.swift in Sources */,
+				56DF3C6725CA7ADDA79836FC /* PromptBank.swift in Sources */,
+				EF15AAADC35815FEAC9C8E62 /* ResultsListView.swift in Sources */,
+				5A254BC616E31D9803C3D587 /* RootView.swift in Sources */,
+				20D75C02FED18D572E8C5C0C /* SpeechAttempt.swift in Sources */,
+				90B75AB0CC7895798A62AFDA /* SpeechAuthorization.swift in Sources */,
+				8DD68F5FCD3A2834874AD326 /* SpeechRecognitionService.swift in Sources */,
+				4F97DAF722C4058471087E7C /* SpeechSpikeView.swift in Sources */,
+				51F6F583629D9CDB64D2EF6C /* SpeechSpikeViewModel.swift in Sources */,
+				C602E78DEA05DFA0B974D38F /* SupportedLocales.swift in Sources */,
+				B9B9C63865CD7FFD8FDC4B37 /* TestPrompt.swift in Sources */,
+				B3A729E94904C778CE1EDA61 /* VoziIOSApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		26C00BB7B2C270B6001DCEA5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "VOZI usa el micrófono para apoyar la práctica de la pronunciación. El audio se procesa en el dispositivo; no se almacena ni se sube.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "VOZI usa el reconocimiento de voz para apoyar la práctica de fonemas. Solo se guarda el texto aproximado y métricas, nunca el audio.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		39273A4E9ACD6BEAB0FCC683 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = U3P7VM523H;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "VOZI usa el micrófono para apoyar la práctica de la pronunciación. El audio se procesa en el dispositivo; no se almacena ni se sube.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "VOZI usa el reconocimiento de voz para apoyar la práctica de fonemas. Solo se guarda el texto aproximado y métricas, nunca el audio.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.alonsosam.vozifase0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		ECABE782D3108A5307F321CF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = U3P7VM523H;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "VOZI usa el micrófono para apoyar la práctica de la pronunciación. El audio se procesa en el dispositivo; no se almacena ni se sube.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "VOZI usa el reconocimiento de voz para apoyar la práctica de fonemas. Solo se guarda el texto aproximado y métricas, nunca el audio.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.alonsosam.vozifase0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		F7635881593462B146316E79 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "VOZI usa el micrófono para apoyar la práctica de la pronunciación. El audio se procesa en el dispositivo; no se almacena ni se sube.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "VOZI usa el reconocimiento de voz para apoyar la práctica de fonemas. Solo se guarda el texto aproximado y métricas, nunca el audio.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		487F5386C9A9EC75DDA2C2BC /* Build configuration list for PBXNativeTarget "VoziIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ECABE782D3108A5307F321CF /* Debug */,
+				39273A4E9ACD6BEAB0FCC683 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		51210B24FFECF29C7E78C6B8 /* Build configuration list for PBXProject "VoziIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F7635881593462B146316E79 /* Debug */,
+				26C00BB7B2C270B6001DCEA5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 69A4695FBFCDE0FD63E04DE1 /* Project object */;
+}

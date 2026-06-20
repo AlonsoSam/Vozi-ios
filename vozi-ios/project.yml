@@ -1,0 +1,24 @@
+name: VoziIOS
+options:
+  bundleIdPrefix: com.vozi
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: YES
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    INFOPLIST_KEY_NSMicrophoneUsageDescription: "VOZI usa el micrófono para apoyar la práctica de la pronunciación. El audio se procesa en el dispositivo; no se almacena ni se sube."
+    INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "VOZI usa el reconocimiento de voz para apoyar la práctica de fonemas. Solo se guarda el texto aproximado y métricas, nunca el audio."
+targets:
+  VoziIOS:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.vozi.ios
+        TARGETED_DEVICE_FAMILY: "1"
