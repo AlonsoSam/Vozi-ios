@@ -8,6 +8,13 @@ enum LearningStage: String, CaseIterable, Codable {
     case palabras = "Palabras"
     case frases   = "Frases"
     case mision   = "Misión"
+
+    /// Flujo del MVP reenfocado (Fase 2): SOLO Palabras (evaluación principal con
+    /// STT base on-device). El modelo de voz/TTS se escucha con el botón dentro de
+    /// cada palabra, así que Escuchar deja de ser una etapa aparte. Sílabas/Frases/
+    /// Misión se mantienen en el enum por compatibilidad con datos previos y con el
+    /// spike de validación, pero quedan fuera del flujo.
+    static let mvpFlow: [LearningStage] = [.palabras]
 }
 
 /// Palabra/objetivo de pronunciación para una prueba de STT.

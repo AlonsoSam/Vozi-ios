@@ -18,7 +18,16 @@ targets:
     platform: iOS
     sources:
       - Sources
+    # Credenciales locales de Azure (BLOQUE 2B). El archivo real está en
+    # .gitignore; usar LocalSecrets.example.xcconfig como plantilla.
+    configFiles:
+      Debug: LocalSecrets.xcconfig
+      Release: LocalSecrets.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.vozi.ios
+        PRODUCT_BUNDLE_IDENTIFIER: com.alonsosam.voziios
         TARGETED_DEVICE_FAMILY: "1"
+        # Info.plist parcial con las credenciales Azure. Xcode lo fusiona con el
+        # plist generado (GENERATE_INFOPLIST_FILE sigue en YES). Valores desde
+        # LocalSecrets.xcconfig; nunca hardcodeados en código.
+        INFOPLIST_FILE: VoziIOS-Info.plist

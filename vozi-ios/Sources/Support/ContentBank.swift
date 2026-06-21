@@ -10,6 +10,11 @@ struct ContentItem: Identifiable, Hashable {
     let text: String          // "ra", "rosa", "la rana salta"
     var audioKey: String? = nil
 
+    /// Clave estable del asset de imagen estática de apoyo (spec §10), opcional
+    /// como `audioKey`. Se rellena en Palabras; si es `nil` o el asset no existe,
+    /// la UI usa un placeholder (`WordImageCatalog`). Ej: "word_rana".
+    var imageKey: String? = nil
+
     /// Objetivo de coincidencia para el STT aproximado. Por defecto es `text`,
     /// pero permite separar lo que se narra de la palabra clave a evaluar.
     var matchTarget: String { text }
@@ -48,86 +53,46 @@ struct PhonemeContent: Identifiable {
 /// Supabase (Storage/DB) más adelante sin tocar la persistencia de progreso.
 enum ContentBank {
 
-    // Umbrales por defecto por etapa. Las sílabas son cadenas cortas y más
-    // sensibles a la distancia de edición, por eso un umbral algo más permisivo.
+    // Umbral por defecto para Palabras (evaluación principal del MVP). Es APOYO:
+    // la aprobación además exige conservar el sonido del fonema (PhonemeWordEvaluator).
     private enum Threshold {
-        static let silabas = 0.60
         static let palabras = 0.70
-        static let frases = 0.65
-        static let mision = 0.70
     }
 
+    // Banco de ~10 palabras por fonema (Fase 2 reenfocada a palabras). Cada palabra
+    // recibe su imageKey derivado por `words()`; si el asset no existe, la UI usa
+    // placeholder. La etapa Escuchar reutiliza las mismas palabras (imagen + audio).
+    private static let rWords  = ["rana", "rosa", "ratón", "reloj", "rueda", "rama", "regalo", "río", "ropa", "radio"]
+    private static let rrWords = ["perro", "carro", "torre", "burro", "gorra", "jarra", "tierra", "barro", "parra", "cerro"]
+    private static let sWords  = ["sapo", "sol", "silla", "sopa", "sandía", "saco", "semilla", "sombrero", "serpiente", "sirena"]
+    private static let lWords  = ["luna", "lápiz", "loro", "leche", "lámpara", "libro", "limón", "llave", "lobo", "lata"]
+    private static let trWords = ["tren", "trapo", "trono", "trigo", "trompo", "tres", "trozo", "trucha", "trenza", "trofeo"]
+    private static let prWords = ["proa", "presa", "prisa", "prado", "prenda", "pradera", "prendedor", "prensa", "pronto", "promesa"]
+    private static let plWords = ["plato", "pluma", "playa", "plaza", "pleno", "pliego", "plancha", "plano", "plaga", "plomo"]
+    private static let brWords = ["brazo", "brisa", "brocha", "brasa", "bravo", "brillo", "broma", "cebra", "libro", "cabra"]
+    private static let blWords = ["blanco", "blusa", "bloque", "blando", "cable", "tabla", "pueblo", "mueble", "ombligo", "establo"]
+
     static let all: [PhonemeContent] = [
-        // MARK: R
-        PhonemeContent(phoneme: .r, stages: [
-            StageContent(stage: .escuchar, items: items(["ra", "re", "ri", "ro", "ru", "rana"]),
-                         usesMicrophone: false, threshold: 0),
-            StageContent(stage: .silabas, items: items(["ra", "re", "ri", "ro", "ru"]),
-                         usesMicrophone: true, threshold: Threshold.silabas),
-            StageContent(stage: .palabras, items: items(["rana", "rosa", "pera", "loro"]),
-                         usesMicrophone: true, threshold: Threshold.palabras),
-            StageContent(stage: .frases, items: items(["la rana salta", "una rosa roja"]),
-                         usesMicrophone: true, threshold: Threshold.frases),
-            StageContent(stage: .mision, items: items(["el loro repite rosa"]),
-                         usesMicrophone: true, threshold: Threshold.mision),
-        ]),
-
-        // MARK: RR
-        PhonemeContent(phoneme: .rr, stages: [
-            StageContent(stage: .escuchar, items: items(["rra", "rre", "rri", "rro", "rru", "perro"]),
-                         usesMicrophone: false, threshold: 0),
-            StageContent(stage: .silabas, items: items(["rra", "rre", "rri", "rro", "rru"]),
-                         usesMicrophone: true, threshold: Threshold.silabas),
-            StageContent(stage: .palabras, items: items(["perro", "carro", "torre"]),
-                         usesMicrophone: true, threshold: Threshold.palabras),
-            StageContent(stage: .frases, items: items(["el perro corre", "el carro rojo"]),
-                         usesMicrophone: true, threshold: Threshold.frases),
-            StageContent(stage: .mision, items: items(["el perro y el carro"]),
-                         usesMicrophone: true, threshold: Threshold.mision),
-        ]),
-
-        // MARK: S
-        PhonemeContent(phoneme: .s, stages: [
-            StageContent(stage: .escuchar, items: items(["sa", "se", "si", "so", "su", "sapo"]),
-                         usesMicrophone: false, threshold: 0),
-            StageContent(stage: .silabas, items: items(["sa", "se", "si", "so", "su"]),
-                         usesMicrophone: true, threshold: Threshold.silabas),
-            StageContent(stage: .palabras, items: items(["sapo", "sol", "silla", "casa"]),
-                         usesMicrophone: true, threshold: Threshold.palabras),
-            StageContent(stage: .frases, items: items(["el sapo salta", "sale el sol"]),
-                         usesMicrophone: true, threshold: Threshold.frases),
-            StageContent(stage: .mision, items: items(["el sapo ve el sol"]),
-                         usesMicrophone: true, threshold: Threshold.mision),
-        ]),
-
-        // MARK: L
-        PhonemeContent(phoneme: .l, stages: [
-            StageContent(stage: .escuchar, items: items(["la", "le", "li", "lo", "lu", "luna"]),
-                         usesMicrophone: false, threshold: 0),
-            StageContent(stage: .silabas, items: items(["la", "le", "li", "lo", "lu"]),
-                         usesMicrophone: true, threshold: Threshold.silabas),
-            StageContent(stage: .palabras, items: items(["luna", "lápiz", "pelota"]),
-                         usesMicrophone: true, threshold: Threshold.palabras),
-            StageContent(stage: .frases, items: items(["la luna brilla", "mi lápiz azul"]),
-                         usesMicrophone: true, threshold: Threshold.frases),
-            StageContent(stage: .mision, items: items(["la luna y la pelota"]),
-                         usesMicrophone: true, threshold: Threshold.mision),
-        ]),
-
-        // MARK: TR
-        PhonemeContent(phoneme: .tr, stages: [
-            StageContent(stage: .escuchar, items: items(["tra", "tre", "tri", "tro", "tru", "tren"]),
-                         usesMicrophone: false, threshold: 0),
-            StageContent(stage: .silabas, items: items(["tra", "tre", "tri", "tro", "tru"]),
-                         usesMicrophone: true, threshold: Threshold.silabas),
-            StageContent(stage: .palabras, items: items(["tren", "trompo", "trigo"]),
-                         usesMicrophone: true, threshold: Threshold.palabras),
-            StageContent(stage: .frases, items: items(["el tren va", "un trompo gira"]),
-                         usesMicrophone: true, threshold: Threshold.frases),
-            StageContent(stage: .mision, items: items(["el tren con el trompo"]),
-                         usesMicrophone: true, threshold: Threshold.mision),
-        ]),
+        mvp(.r,  rWords),
+        mvp(.rr, rrWords),
+        mvp(.s,  sWords),
+        mvp(.l,  lWords),
+        mvp(.tr, trWords),
+        mvp(.pr, prWords),
+        mvp(.pl, plWords),
+        mvp(.br, brWords),
+        mvp(.bl, blWords),
     ]
+
+    /// Construye el contenido MVP de un fonema: solo Palabras (evaluación principal
+    /// con micrófono). Cada palabra trae imagen, texto, botón de escuchar modelo/TTS
+    /// y botón de pronunciar.
+    private static func mvp(_ phoneme: Phoneme, _ wordList: [String]) -> PhonemeContent {
+        PhonemeContent(phoneme: phoneme, stages: [
+            StageContent(stage: .palabras, items: words(wordList),
+                         usesMicrophone: true, threshold: Threshold.palabras),
+        ])
+    }
 
     static func content(for phoneme: Phoneme) -> PhonemeContent {
         // `all` cubre todos los casos del enum; el fallback nunca debería ocurrir.
@@ -140,7 +105,10 @@ enum ContentBank {
 
     // MARK: - Helpers
 
-    private static func items(_ texts: [String]) -> [ContentItem] {
-        texts.map { ContentItem(text: $0) }
+    /// Asocia a cada palabra su clave de imagen estática
+    /// derivada del texto (spec §10). El asset puede no existir aún: la UI usa
+    /// placeholder vía `WordImageCatalog`.
+    private static func words(_ texts: [String]) -> [ContentItem] {
+        texts.map { ContentItem(text: $0, imageKey: WordImageCatalog.imageKey(for: $0)) }
     }
 }

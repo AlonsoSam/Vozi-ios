@@ -110,7 +110,7 @@ enum ProgressFactory {
                 phonemeCode: phoneme.code,
                 status: isFirstPhoneme ? .available : .locked
             )
-            phonemeProgress.stages = LearningStage.allCases.enumerated().map { stageIndex, stage in
+            phonemeProgress.stages = LearningStage.mvpFlow.enumerated().map { stageIndex, stage in
                 let isFirstStage = stageIndex == 0
                 let status: ProgressStatus = (isFirstPhoneme && isFirstStage) ? .available : .locked
                 return StageProgress(stage: stage, status: status)

@@ -43,6 +43,8 @@ struct SpeakingExerciseView: View {
 
             Spacer()
 
+            WordImageView(imageKey: vm.item.imageKey)
+
             Text(vm.item.text)
                 .font(.system(size: 48, weight: .bold, design: .rounded))
                 .multilineTextAlignment(.center)
@@ -58,7 +60,15 @@ struct SpeakingExerciseView: View {
 
             Spacer()
 
-            if vm.showResult {
+            if vm.isEvaluating {
+                VStack(spacing: 10) {
+                    ProgressView()
+                        .controlSize(.large)
+                    Text("Escuchando con atención…")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            } else if vm.showResult {
                 feedbackPanel
             } else {
                 micButton
@@ -89,12 +99,24 @@ struct SpeakingExerciseView: View {
     }
 
     private var feedbackPanel: some View {
-        VStack(spacing: 16) {
-            Image(systemName: vm.passed ? "star.circle.fill" : "hand.thumbsup.circle.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(vm.passed ? .green : .orange)
+        // Tres estados: aprobado, "te escuché pero sin puntaje" (modo avanzado sin
+        // score útil) y "casi". Sin números ni lenguaje clínico para el niño.
+        let icon = vm.passed ? "star.circle.fill"
+            : (vm.heardButNoScore ? "waveform.circle.fill" : "hand.thumbsup.circle.fill")
+        let tint: Color = vm.passed ? .green : (vm.heardButNoScore ? .blue : .orange)
+        let title: String = {
+            if vm.passed { return "¡Muy bien!" }
+            if vm.lastPhonemeMissed { return "Casi, intentemos escuchar bien ese sonido." }
+            if vm.heardButNoScore { return "Te escuché, intentemos una vez más" }
+            return "¡Casi! Sigue practicando"
+        }()
 
-            Text(vm.passed ? "¡Muy bien!" : "¡Casi! Sigue practicando")
+        return VStack(spacing: 16) {
+            Image(systemName: icon)
+                .font(.system(size: 56))
+                .foregroundStyle(tint)
+
+            Text(title)
                 .font(.title2.bold())
                 .multilineTextAlignment(.center)
 

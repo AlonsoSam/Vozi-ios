@@ -86,10 +86,11 @@ struct ResultsListView: View {
 /// Generador de CSV para análisis fuera de la app (calibración de umbrales).
 enum AttemptCSV {
     static func make(_ attempts: [SpeechAttempt]) -> String {
-        let header = "timestamp,phoneme,word,stage,transcription,similarity,threshold,algorithmPassed,humanJudgment,durationMs,locale,onDevice,ageBand"
+        let header = "timestamp,phoneme,word,stage,transcription,similarity,threshold,algorithmPassed,humanJudgment,durationMs,locale,onDevice,ageBand,evaluationMode,advancedProvider,advancedAccuracy,advancedFluency,advancedCompleteness,evaluatedAt"
         let df = ISO8601DateFormatter()
         let rows = attempts.map { a -> String in
-            [
+            func num(_ v: Double?) -> String { v.map { String(format: "%.1f", $0) } ?? "" }
+            return [
                 df.string(from: a.timestamp),
                 a.targetPhoneme,
                 a.targetWord,
@@ -102,7 +103,13 @@ enum AttemptCSV {
                 "\(a.durationMs)",
                 a.recognizerLocale,
                 "\(a.onDevice)",
-                a.childAgeBand
+                a.childAgeBand,
+                a.evaluationMode,
+                a.advancedProvider ?? "",
+                num(a.advancedAccuracy),
+                num(a.advancedFluency),
+                num(a.advancedCompleteness),
+                a.evaluatedAt.map { df.string(from: $0) } ?? ""
             ].joined(separator: ",")
         }
         return ([header] + rows).joined(separator: "\n")

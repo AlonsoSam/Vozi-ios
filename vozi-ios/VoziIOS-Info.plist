@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Info.plist parcial: SOLO expone las credenciales locales de Azure (BLOQUE 2B)
+  para lectura segura en runtime. Los valores se sustituyen desde LocalSecrets.xcconfig
+  vía las build settings $(AZURE_SPEECH_*); nunca se hardcodean aquí.
+  Xcode fusiona estas claves con el Info.plist generado (GENERATE_INFOPLIST_FILE),
+  que sigue aportando defaults, launch screen y los usage strings de micrófono/voz.
+-->
+<plist version="1.0">
+<dict>
+    <key>AZURE_SPEECH_KEY</key>
+    <string>$(AZURE_SPEECH_KEY)</string>
+    <key>AZURE_SPEECH_REGION</key>
+    <string>$(AZURE_SPEECH_REGION)</string>
+    <key>AZURE_SPEECH_ENDPOINT</key>
+    <string>$(AZURE_SPEECH_ENDPOINT)</string>
+</dict>
+</plist>

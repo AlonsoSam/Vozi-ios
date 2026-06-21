@@ -1,18 +1,21 @@
 import SwiftUI
 import SwiftData
 
-/// Detalle de un fonema: sus 5 etapas en orden (Escuchar → Sílabas → Palabras →
-/// Frases → Misión) con su estado. Las etapas no bloqueadas navegan al ejercicio.
+/// Detalle de un fonema: el flujo MVP en orden (Escuchar → Palabras) con su
+/// estado. Las etapas no bloqueadas navegan al ejercicio.
 struct PhonemeDetailView: View {
     let progress: PhonemeProgress
 
-    /// Etapas ordenadas pedagógicamente según `LearningStage.allCases`.
+    /// Etapas del flujo MVP (Escuchar, Palabras), en orden. Filtra cualquier
+    /// etapa fuera del flujo (p. ej. datos previos con Sílabas/Frases/Misión).
     private var orderedStages: [StageProgress] {
-        let order = LearningStage.allCases
-        return progress.stages.sorted {
-            (order.firstIndex(of: $0.stage ?? .escuchar) ?? .max)
-                < (order.firstIndex(of: $1.stage ?? .escuchar) ?? .max)
-        }
+        let order = LearningStage.mvpFlow
+        return progress.stages
+            .filter { stage in order.contains(where: { $0 == stage.stage }) }
+            .sorted {
+                (order.firstIndex(of: $0.stage ?? .escuchar) ?? .max)
+                    < (order.firstIndex(of: $1.stage ?? .escuchar) ?? .max)
+            }
     }
 
     var body: some View {

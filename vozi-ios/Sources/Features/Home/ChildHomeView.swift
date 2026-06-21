@@ -25,20 +25,29 @@ struct ChildHomeView: View {
         }
         .navigationTitle("¡Hola, \(profile.name)!")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: PhonemeProgress.self) { progress in
-            PhonemeDetailView(progress: progress)
+        .navigationDestination(for: StageProgress.self) { stageProgress in
+            ExerciseView(stageProgress: stageProgress)
         }
+    }
+
+    /// Etapa de Palabras del fonema (flujo MVP: entra directo aquí).
+    private func wordsStage(_ progress: PhonemeProgress) -> StageProgress? {
+        progress.stages.first { $0.stage == .palabras }
     }
 
     @ViewBuilder
     private func tile(for progress: PhonemeProgress) -> some View {
-        if progress.status == .locked {
-            PhonemeTile(progress: progress)            // bloqueado: no navega
-        } else {
-            NavigationLink(value: progress) {
-                PhonemeTile(progress: progress)
+        // No bloqueado (o modo desarrollador): entra directo a la práctica de
+        // palabras. El progreso real no se altera; solo se evita el candado.
+        let unlocked = progress.status != .locked || DeveloperSettings.isDeveloperModeEnabled
+        if unlocked, let stage = wordsStage(progress) {
+            NavigationLink(value: stage) {
+                PhonemeTile(progress: progress,
+                            forceUnlocked: DeveloperSettings.isDeveloperModeEnabled)
             }
             .buttonStyle(.plain)
+        } else {
+            PhonemeTile(progress: progress)
         }
     }
 }
@@ -46,10 +55,12 @@ struct ChildHomeView: View {
 /// Tarjeta grande de un fonema con icono y estado.
 private struct PhonemeTile: View {
     let progress: PhonemeProgress
+    /// En modo desarrollador se muestra desbloqueado aunque el estado sea locked.
+    var forceUnlocked: Bool = false
 
     var body: some View {
         let phoneme = progress.phoneme
-        let locked = progress.status == .locked
+        let locked = progress.status == .locked && !forceUnlocked
         let completed = progress.status == .completed
 
         VStack(spacing: 12) {

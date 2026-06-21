@@ -11,6 +11,10 @@ enum Phoneme: String, CaseIterable, Identifiable, Codable {
     case s  = "S"
     case l  = "L"
     case tr = "TR"
+    case pr = "PR"
+    case pl = "PL"
+    case br = "BR"
+    case bl = "BL"
 
     var id: String { rawValue }
 
@@ -25,6 +29,10 @@ enum Phoneme: String, CaseIterable, Identifiable, Codable {
         case .s:  return "S"
         case .l:  return "L"
         case .tr: return "TR"
+        case .pr: return "PR"
+        case .pl: return "PL"
+        case .br: return "BR"
+        case .bl: return "BL"
         }
     }
 
@@ -36,6 +44,10 @@ enum Phoneme: String, CaseIterable, Identifiable, Codable {
         case .s:  return "sun.max.fill"     // sol
         case .l:  return "moon.fill"        // luna
         case .tr: return "tram.fill"        // tren
+        case .pr: return "crown.fill"       // princesa/premio
+        case .pl: return "fork.knife"       // plato
+        case .br: return "hand.wave.fill"   // brazo/bravo
+        case .bl: return "square.stack.3d.up.fill"  // bloque
         }
     }
 
@@ -47,6 +59,10 @@ enum Phoneme: String, CaseIterable, Identifiable, Codable {
         case .s:  return 2
         case .l:  return 3
         case .tr: return 4
+        case .pr: return 5
+        case .pl: return 6
+        case .br: return 7
+        case .bl: return 8
         }
     }
 }

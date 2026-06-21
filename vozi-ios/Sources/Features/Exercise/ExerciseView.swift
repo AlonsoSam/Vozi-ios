@@ -55,6 +55,8 @@ private struct ListenExerciseView: View {
 
             Spacer()
 
+            WordImageView(imageKey: item.imageKey)
+
             Text(item.text)
                 .font(.system(size: 56, weight: .bold, design: .rounded))
                 .minimumScaleFactor(0.5)
@@ -62,7 +64,7 @@ private struct ListenExerciseView: View {
                 .padding(.horizontal)
 
             Button {
-                voice.speak(item.text)
+                voice.speak(item: item)
             } label: {
                 Label("Escuchar", systemImage: voice.isSpeaking ? "speaker.wave.3.fill" : "speaker.wave.2.fill")
                     .font(.title2.bold())
@@ -109,8 +111,8 @@ private struct ListenExerciseView: View {
             .padding(.horizontal)
         }
         .padding(.vertical)
-        .onAppear { voice.speak(item.text) }
-        .onChange(of: index) { _, _ in voice.speak(item.text) }
+        .onAppear { voice.speak(item: item) }
+        .onChange(of: index) { _, _ in voice.speak(item: item) }
         .onDisappear { voice.stop() }
     }
 }
