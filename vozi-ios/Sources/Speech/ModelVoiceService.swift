@@ -3,9 +3,9 @@ import AVFoundation
 
 /// Narración del "audio modelo" con TTS del sistema (AVSpeechSynthesizer).
 ///
-/// Decisión de Fase 1: el audio modelo se genera por TTS. Si más adelante se
-/// empaquetan clips de voz humana curados, se reproducen desde `ContentItem.audioKey`
-/// sin cambiar las vistas. Este servicio es independiente del STT de Fase 0.
+/// El audio modelo se genera por TTS. Si más adelante se empaquetan clips de voz
+/// humana curados, se reproducen desde `ContentItem.audioKey` sin cambiar las
+/// vistas. Este servicio es independiente del STT base.
 @Observable
 final class ModelVoiceService: NSObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDelegate {
     private let synth = AVSpeechSynthesizer()
@@ -21,13 +21,25 @@ final class ModelVoiceService: NSObject, AVSpeechSynthesizerDelegate, AVAudioPla
         synth.delegate = self
     }
 
-    /// Reproduce el audio modelo de un ítem: si hay un clip personalizado curado
-    /// (`audioKey`), lo usa; si no, cae a TTS del sistema como respaldo (spec §10).
+    /// Reproduce el audio modelo de un ítem (botón Escuchar). Prioridad (spec §10,
+    /// Fase 5): 1) `.mp3` personalizado de la palabra; 2) clip curado `.m4a` por
+    /// `audioKey`; 3) TTS del sistema como respaldo. Nunca audio del niño.
     func speak(item: ContentItem) {
+        if let url = ModelAudioCatalog.wordURL(for: item.text), playClip(url) {
+            return
+        }
         if let url = ModelAudioCatalog.url(forKey: item.audioKey), playClip(url) {
             return
         }
         speak(item.text)
+    }
+
+    /// Reproduce una frase de feedback aleatoria (acierto / fallo / fin de sesión)
+    /// si existe el audio; si no, no hace nada (sin crashear ni hablar por TTS).
+    /// Solo audio modelo curado, nunca del niño.
+    func playFeedback(_ kind: ModelAudioCatalog.Feedback) {
+        guard let url = ModelAudioCatalog.randomFeedbackURL(kind) else { return }
+        _ = playClip(url)
     }
 
     func speak(_ text: String) {
@@ -67,7 +79,7 @@ final class ModelVoiceService: NSObject, AVSpeechSynthesizerDelegate, AVAudioPla
         }
     }
 
-    /// La etapa Escuchar no graba; solo reproduce. Categoría de reproducción.
+    /// Categoría de reproducción para el audio modelo (no graba).
     private func configureSessionForPlayback() {
         let session = AVAudioSession.sharedInstance()
         try? session.setCategory(.playback, mode: .spokenAudio, options: .duckOthers)

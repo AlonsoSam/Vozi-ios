@@ -21,12 +21,6 @@ struct RootView: View {
                 .tabItem {
                     Label("Adultos", systemImage: "lock.shield.fill")
                 }
-
-                // Fase 0: spike validado de Speech-to-Text. Se conserva accesible.
-                SpeechSpikeView()
-                    .tabItem {
-                        Label("Spike STT", systemImage: "waveform")
-                    }
             }
         case .some(false):
             PermissionsView(authorized: $authorized, denied: true)

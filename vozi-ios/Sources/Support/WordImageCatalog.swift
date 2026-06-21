@@ -31,13 +31,17 @@ enum WordImageCatalog {
 
 /// Imagen estática de apoyo de una palabra, en una card consistente (spec §10/§11).
 ///
-/// Solo se renderiza si el ítem tiene `imageKey` (las palabras lo llevan; sílabas
-/// no). Si la clave existe pero el asset aún no está empaquetado, muestra un
-/// placeholder amable en vez de un hueco. Altura fija para no colapsar entre
-/// `Spacer()` y sin deformar la imagen (`scaledToFit`).
+/// Solo se renderiza si el ítem tiene `imageKey`. Si la clave existe pero el asset
+/// aún no está empaquetado, muestra un placeholder amable en vez de un hueco.
+///
+/// `height` es responsiva: el llamador la calcula según el alto disponible
+/// (Fase 3). El ancho se adapta al contenedor con un tope para no deformar en
+/// pantallas grandes; `scaledToFit` mantiene la proporción.
 struct WordImageView: View {
     let imageKey: String?
-    var height: CGFloat = 150
+    var height: CGFloat = 180
+    /// Color de acento del fonema/grupo (Fase 3B): tiñe el borde de la card.
+    var tint: Color = .accentColor
 
     var body: some View {
         if let imageKey {
@@ -59,11 +63,15 @@ struct WordImageView: View {
 
     @ViewBuilder
     private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 28, style: .continuous)
         content()
-            .frame(maxWidth: 200)
+            .frame(maxWidth: .infinity)
             .frame(height: height)
             .padding(16)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28))
+            .frame(maxWidth: 320)
+            .background(Color(.systemBackground), in: shape)
+            .overlay(shape.strokeBorder(tint.opacity(0.35), lineWidth: 2))
+            .shadow(color: tint.opacity(0.22), radius: 14, x: 0, y: 8)
             .accessibilityHidden(true)
     }
 }

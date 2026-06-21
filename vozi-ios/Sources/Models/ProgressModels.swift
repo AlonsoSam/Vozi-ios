@@ -1,6 +1,28 @@
 import Foundation
 import SwiftData
 
+/// Etapa pedagógica del MVP. El flujo actual es directo a **Palabras** (única
+/// etapa): el niño ve la imagen y la palabra, escucha el modelo/TTS y la
+/// pronuncia para la evaluación con STT base on-device. Las etapas antiguas
+/// (Escuchar/Sílabas/Frases/Misión) se retiraron del MVP.
+///
+/// Se mantiene como enum (no como literal) porque `StageProgress` persiste su
+/// `rawValue` y `ContentBank` indexa el contenido por etapa.
+enum LearningStage: String, CaseIterable, Codable {
+    case palabras = "Palabras"
+
+    /// Flujo del MVP: solo Palabras.
+    static let mvpFlow: [LearningStage] = [.palabras]
+}
+
+/// Subperfil por edad (spec §11): guía la experiencia (4–5 más audio/menos
+/// lectura; 6–7 mayor autonomía). Se persiste como `rawValue` en el perfil.
+enum AgeBand: String, CaseIterable, Identifiable {
+    case young = "4-5"
+    case older = "6-7"
+    var id: String { rawValue }
+}
+
 /// Estado de avance de un fonema o etapa para un perfil de niño.
 /// Se persiste como `rawValue` (String) para mapear directo a Supabase (Fase 1+),
 /// sin conectarlo aún.
@@ -22,6 +44,11 @@ final class ChildProfile {
     var avatarKey: String         // placeholder; ilustración real en Fase 4
     var createdAt: Date
 
+    /// Puntos acumulados de gamificación (Fase 4). +10 por lista de fonema/grupo
+    /// terminada. Solo recompensa visual; no afecta la evaluación. Default a nivel
+    /// de propiedad para migración ligera de SwiftData sobre stores previos.
+    var points: Int = 0
+
     /// Progreso por fonema. Cascade: borrar el perfil borra su progreso.
     @Relationship(deleteRule: .cascade, inverse: \PhonemeProgress.child)
     var phonemeProgress: [PhonemeProgress] = []
@@ -40,6 +67,12 @@ final class ChildProfile {
     }
 
     var ageBand: AgeBand { AgeBand(rawValue: ageBandRaw) ?? .young }
+
+    /// Veces que se terminó la lista de palabras de un fonema/grupo (gamificación).
+    /// Eje independiente del `status` de aprendizaje; alimenta el desbloqueo de skins.
+    func completionCount(forCode code: String) -> Int {
+        phonemeProgress.first { $0.phonemeCode == code }?.completionCount ?? 0
+    }
 }
 
 /// Avance de un fonema concreto para un perfil.
@@ -49,9 +82,14 @@ final class PhonemeProgress {
     var phonemeCode: String       // "R", "RR", "S", "L", "TR"
     var statusRaw: String         // ver `ProgressStatus`
 
+    /// Veces que el niño terminó la lista de palabras de este fonema/grupo
+    /// (Fase 4). Eje de gamificación, independiente de `status`. Alimenta el
+    /// desbloqueo de skins. Default a nivel de propiedad para migración ligera.
+    var completionCount: Int = 0
+
     var child: ChildProfile?
 
-    /// Avance de las 5 etapas de este fonema. Cascade desde el fonema.
+    /// Avance de las etapas de este fonema (MVP: solo Palabras). Cascade desde el fonema.
     @Relationship(deleteRule: .cascade, inverse: \StageProgress.phonemeProgress)
     var stages: [StageProgress] = []
 
@@ -68,7 +106,7 @@ final class PhonemeProgress {
     }
 }
 
-/// Avance de una etapa (Escuchar/Sílabas/Palabras/Frases/Misión) dentro de un fonema.
+/// Avance de una etapa (MVP: Palabras) dentro de un fonema.
 @Model
 final class StageProgress {
     var id: UUID
@@ -96,10 +134,10 @@ final class StageProgress {
 
 /// Construye el árbol de progreso inicial de un perfil nuevo.
 ///
-/// Estado inicial: el primer fonema (orden 0) queda disponible con su primera
-/// etapa (Escuchar) disponible; todo lo demás bloqueado. Las TRANSICIONES de
-/// desbloqueo (completar etapa → abrir la siguiente) son del Paso 7; aquí solo
-/// se siembra el estado inicial navegable.
+/// Estado inicial: el primer fonema (orden 0) queda disponible con su etapa de
+/// Palabras disponible; todo lo demás bloqueado. Las TRANSICIONES de desbloqueo
+/// (completar fonema → abrir el siguiente) se aplican al terminar la práctica;
+/// aquí solo se siembra el estado inicial navegable.
 enum ProgressFactory {
 
     static func makeInitialProgress() -> [PhonemeProgress] {

@@ -32,22 +32,7 @@ final class SpeechAttempt {
     var onDevice: Bool                // true si el reconocimiento fue local
     var childAgeBand: String          // "4-5" / "6-7"
 
-    // MARK: - Evaluación avanzada (Fase 2, opcional)
-    //
-    // Campos referenciales/educativos del modo avanzado (Azure Pronunciation
-    // Assessment). Opcionales: los intentos en modo base los dejan en nil.
-    // `evaluationMode` distingue "base" (Apple) de "advanced" (Azure).
-    // Default a nivel de propiedad: requerido para que SwiftData pueda hacer
-    // migración ligera de este atributo no-opcional sobre stores con datos previos.
-    var evaluationMode: String = "base"   // "base" / "advanced"
-    var advancedProvider: String?     // "azure" / nil
-    var advancedAccuracy: Double?     // 0...100
-    var advancedFluency: Double?      // 0...100
-    var advancedCompleteness: Double? // 0...100
-    var evaluatedAt: Date?
-
-    /// Perfil de niño asociado (Fase 1). Opcional: los intentos del spike de
-    /// Fase 0 no tienen perfil. La inversa se declara en `ChildProfile.attempts`.
+    /// Perfil de niño asociado. La inversa se declara en `ChildProfile.attempts`.
     var child: ChildProfile?
 
     init(
@@ -62,13 +47,7 @@ final class SpeechAttempt {
         durationMs: Int,
         recognizerLocale: String,
         onDevice: Bool,
-        childAgeBand: String,
-        evaluationMode: String = "base",
-        advancedProvider: String? = nil,
-        advancedAccuracy: Double? = nil,
-        advancedFluency: Double? = nil,
-        advancedCompleteness: Double? = nil,
-        evaluatedAt: Date? = nil
+        childAgeBand: String
     ) {
         self.id = UUID()
         self.timestamp = Date()
@@ -84,11 +63,5 @@ final class SpeechAttempt {
         self.recognizerLocale = recognizerLocale
         self.onDevice = onDevice
         self.childAgeBand = childAgeBand
-        self.evaluationMode = evaluationMode
-        self.advancedProvider = advancedProvider
-        self.advancedAccuracy = advancedAccuracy
-        self.advancedFluency = advancedFluency
-        self.advancedCompleteness = advancedCompleteness
-        self.evaluatedAt = evaluatedAt
     }
 }

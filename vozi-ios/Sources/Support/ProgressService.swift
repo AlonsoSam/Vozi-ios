@@ -9,17 +9,36 @@ import SwiftData
 /// aislada en su propio archivo.
 enum ProgressService {
 
+    /// Puntos de gamificación otorgados por cada lista de fonema/grupo terminada
+    /// (Fase 4). Recompensa visual; no afecta la evaluación. Cuando llegue la fase
+    /// Supabase, esta regla sensible debe migrar a Edge Functions.
+    static let pointsPerCompletion = 10
+
     /// Marca una etapa como completada y desbloquea la siguiente. Si era la
-    /// última etapa del fonema, marca el fonema como completado y desbloquea el
-    /// primer fonema siguiente (etapa Escuchar). Idempotente: solo pasa de
+    /// última etapa del fonema (MVP: Palabras), marca el fonema como completado y
+    /// desbloquea el primer fonema siguiente. Idempotente: solo pasa de
     /// `locked` a `available`, nunca regresa estados.
-    static func completeStage(_ stageProgress: StageProgress, in context: ModelContext) {
+    ///
+    /// Gamificación (Fase 4): la recompensa (sumar `completionCount` y otorgar
+    /// `pointsPerCompletion`) se aplica SOLO si `rewarded == true`, es decir, si la
+    /// sesión alcanzó el 90% de aciertos (lo decide el ViewModel). El desbloqueo
+    /// educativo del siguiente fonema NO se gatea: ocurre al terminar la lista para
+    /// no frustrar el flujo de práctica. NO cambia la evaluación por palabra.
+    static func completeStage(_ stageProgress: StageProgress,
+                              rewarded: Bool,
+                              in context: ModelContext) {
         stageProgress.status = .completed
         stageProgress.lastPracticedAt = Date()
 
         guard let phonemeProgress = stageProgress.phonemeProgress else {
             try? context.save()
             return
+        }
+
+        // Gamificación: solo con sesión recompensada (≥90% de aciertos).
+        if rewarded {
+            phonemeProgress.completionCount += 1
+            phonemeProgress.child?.points += pointsPerCompletion
         }
 
         let stages = sortedStages(phonemeProgress.stages)
@@ -37,8 +56,7 @@ enum ProgressService {
         try? context.save()
     }
 
-    /// Registra una práctica de etapa (actualiza marca de tiempo y contador) sin
-    /// completarla. Útil para la etapa Escuchar al avanzar ítems.
+    /// Registra una práctica de etapa (actualiza marca de tiempo) sin completarla.
     static func touch(_ stageProgress: StageProgress, in context: ModelContext) {
         stageProgress.lastPracticedAt = Date()
         try? context.save()
@@ -68,8 +86,8 @@ enum ProgressService {
     private static func sortedStages(_ stages: [StageProgress]) -> [StageProgress] {
         let order = LearningStage.allCases
         return stages.sorted {
-            (order.firstIndex(of: $0.stage ?? .escuchar) ?? .max)
-                < (order.firstIndex(of: $1.stage ?? .escuchar) ?? .max)
+            (order.firstIndex(of: $0.stage ?? .palabras) ?? .max)
+                < (order.firstIndex(of: $1.stage ?? .palabras) ?? .max)
         }
     }
 }
