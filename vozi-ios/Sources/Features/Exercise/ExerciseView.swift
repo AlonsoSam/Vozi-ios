@@ -18,7 +18,14 @@ struct ExerciseView: View {
             if let content, let phoneme {
                 SpeakingExerciseView(content: content, phoneme: phoneme, stageProgress: stageProgress)
             } else {
-                ContentUnavailableView("Sin contenido", systemImage: "questionmark")
+                VStack {
+                    VoziEmptyState(symbol: "questionmark.circle.fill",
+                                   title: "Sin contenido",
+                                   message: "Aún no hay palabras para practicar aquí.",
+                                   color: VoziTheme.neutral)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .voziBackground()
             }
         }
         .navigationTitle(stage?.rawValue ?? "")

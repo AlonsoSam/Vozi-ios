@@ -28,11 +28,12 @@ struct ParentGateView<Content: View>: View {
             title: "Crear PIN de adulto",
             subtitle: "Define un PIN de 4 dígitos para proteger la zona de adultos."
         ) {
-            SecureField("PIN nuevo", text: $entry)
-            SecureField("Repetir PIN", text: $confirm)
+            field("PIN nuevo", text: $entry)
+            field("Repetir PIN", text: $confirm)
             Button("Guardar PIN") { savePIN() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(VoziBigButtonStyle(fill: VoziTheme.brand))
                 .disabled(entry.count < 4)
+                .opacity(entry.count < 4 ? 0.6 : 1)
         }
     }
 
@@ -41,10 +42,11 @@ struct ParentGateView<Content: View>: View {
             title: "Zona de adultos",
             subtitle: "Ingresa tu PIN para ver el progreso."
         ) {
-            SecureField("PIN", text: $entry)
+            field("PIN", text: $entry)
             Button("Entrar") { checkPIN() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(VoziBigButtonStyle(fill: VoziTheme.brand))
                 .disabled(entry.isEmpty)
+                .opacity(entry.isEmpty ? 0.6 : 1)
         }
     }
 
@@ -53,28 +55,39 @@ struct ParentGateView<Content: View>: View {
         subtitle: String,
         @ViewBuilder fields: () -> Fields
     ) -> some View {
-        VStack(spacing: 20) {
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 56))
-                .foregroundStyle(.tint)
-            Text(title).font(.title2.bold())
-            Text(subtitle)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+        VStack {
+            Spacer(minLength: 0)
+            VStack(spacing: VoziTheme.Space.lg) {
+                VoziHero(symbol: "lock.shield.fill", title: title, subtitle: subtitle,
+                         color: VoziTheme.lavender)
 
-            VStack(spacing: 12) {
-                fields()
+                VStack(spacing: VoziTheme.Space.md) {
+                    fields()
+                    if let error {
+                        Label(error, systemImage: "exclamationmark.circle.fill")
+                            .font(.vozi(.footnote, weight: .semibold))
+                            .foregroundStyle(VoziTheme.coral)
+                    }
+                }
+                .padding(VoziTheme.Space.lg)
+                .voziCard()
             }
-            .textFieldStyle(.roundedBorder)
-            .keyboardType(.numberPad)
-            .frame(maxWidth: 320)
-
-            if let error {
-                Text(error).font(.footnote).foregroundStyle(.red)
-            }
+            .frame(maxWidth: 360)
+            .padding(VoziTheme.Space.xl)
+            Spacer(minLength: 0)
         }
-        .padding(32)
+        .frame(maxWidth: .infinity)
+        .voziBackground()
+    }
+
+    private func field(_ placeholder: String, text: Binding<String>) -> some View {
+        SecureField(placeholder, text: text)
+            .font(.vozi(.title3, weight: .semibold))
+            .multilineTextAlignment(.center)
+            .keyboardType(.numberPad)
+            .padding(.vertical, 14)
+            .background(VoziTheme.brand.opacity(0.08),
+                        in: RoundedRectangle(cornerRadius: VoziTheme.Radius.sm, style: .continuous))
     }
 
     private func savePIN() {

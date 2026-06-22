@@ -8,44 +8,85 @@ struct PermissionsView: View {
     @State private var requesting = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "waveform.circle.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(.tint)
+        ScrollView {
+            VStack(spacing: VoziTheme.Space.xl) {
+                Spacer(minLength: VoziTheme.Space.lg)
 
-            Text("VOZI")
-                .font(.largeTitle.bold())
-
-            Text("Práctica y refuerzo de pronunciación")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            Text("Experiencia educativa para niños de 4 a 7 años. La práctica usa el micrófono para apoyar el refuerzo de fonemas. El audio se procesa en el dispositivo; VOZI no almacena ni sube el audio, solo el texto aproximado y el progreso.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
-            if denied {
-                Text("Permiso denegado. Actívalo en Ajustes para continuar.")
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-            }
-
-            Button {
-                Task {
-                    requesting = true
-                    authorized = await SpeechAuthorization.requestAll()
-                    requesting = false
+                // Marca: logotipo hero + nombre + tagline.
+                VStack(spacing: VoziTheme.Space.md) {
+                    VoziHeroIcon(symbol: "waveform", color: VoziTheme.brand, size: 116)
+                    Text("VOZI")
+                        .font(.vozi(size: 46, weight: .heavy))
+                        .foregroundStyle(VoziTheme.ink)
+                    Text("Práctica y refuerzo de pronunciación")
+                        .font(.vozi(.headline))
+                        .foregroundStyle(VoziTheme.inkSoft)
+                        .multilineTextAlignment(.center)
                 }
-            } label: {
-                Text(requesting ? "Solicitando…" : "Conceder micrófono y voz")
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
+
+                // Tarjeta de consentimiento, clara para el adulto.
+                VStack(spacing: VoziTheme.Space.md) {
+                    infoRow("figure.and.child.holding.hands",
+                            "Para peques de 4 a 7 años",
+                            "Una experiencia educativa para practicar fonemas jugando.")
+                    Divider()
+                    infoRow("mic.fill",
+                            "Usa el micrófono",
+                            "La práctica escucha al niño para apoyar el refuerzo de sonidos.")
+                    Divider()
+                    infoRow("lock.shield.fill",
+                            "Privacidad primero",
+                            "El audio se procesa en el dispositivo. VOZI no guarda ni sube audio: solo texto aproximado y progreso.")
+                }
+                .padding(VoziTheme.Space.lg)
+                .voziCard()
+
+                if denied {
+                    Label("Permiso denegado. Actívalo en Ajustes para continuar.",
+                          systemImage: "exclamationmark.triangle.fill")
+                        .font(.vozi(.footnote, weight: .semibold))
+                        .foregroundStyle(VoziTheme.coral)
+                        .multilineTextAlignment(.center)
+                }
+
+                Button {
+                    Task {
+                        requesting = true
+                        authorized = await SpeechAuthorization.requestAll()
+                        requesting = false
+                    }
+                } label: {
+                    Label(requesting ? "Solicitando…" : "Conceder micrófono y voz",
+                          systemImage: requesting ? "hourglass" : "checkmark.circle.fill")
+                }
+                .buttonStyle(VoziBigButtonStyle(fill: VoziTheme.mint))
+                .disabled(requesting)
+
+                Spacer(minLength: VoziTheme.Space.md)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(requesting)
+            .padding(VoziTheme.Space.xl)
+            .frame(maxWidth: 480)
+            .frame(maxWidth: .infinity)
         }
-        .padding(32)
+        .voziBackground()
+    }
+
+    private func infoRow(_ symbol: String, _ title: String, _ subtitle: String) -> some View {
+        HStack(alignment: .top, spacing: VoziTheme.Space.md) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(VoziTheme.brand)
+                .frame(width: 32)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.vozi(.subheadline, weight: .bold))
+                    .foregroundStyle(VoziTheme.ink)
+                Text(subtitle)
+                    .font(.vozi(.footnote))
+                    .foregroundStyle(VoziTheme.inkSoft)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
     }
 }

@@ -8,5 +8,5 @@ import Foundation
 /// NO elimina el sistema de progreso/desbloqueo: solo evita el candado en la UI;
 /// el progreso por palabras correctas se sigue registrando igual.
 enum DeveloperSettings {
-    static let isDeveloperModeEnabled = true
+    static let isDeveloperModeEnabled = false
 }

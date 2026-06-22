@@ -32,6 +32,13 @@ final class SpeechAttempt {
     var onDevice: Bool                // true si el reconocimiento fue local
     var childAgeBand: String          // "4-5" / "6-7"
 
+    // MARK: - Sincronización (Fase 7.3 · sin sync todavía)
+    /// Append-only: el intento es inmutable salvo el juicio del adulto. No lleva
+    /// `updatedAt` (se reutiliza `timestamp` como created_at, espejando la tabla
+    /// `speech_attempts`) ni `deletedAt` (nunca se borra). `isDirty` arranca en true
+    /// para que el primer push lo suba. NO se sube `rawTranscription`: queda local.
+    var isDirty: Bool = true
+
     /// Perfil de niño asociado. La inversa se declara en `ChildProfile.attempts`.
     var child: ChildProfile?
 
@@ -63,5 +70,12 @@ final class SpeechAttempt {
         self.recognizerLocale = recognizerLocale
         self.onDevice = onDevice
         self.childAgeBand = childAgeBand
+        // Nuevo intento: nace pendiente de sincronizar (isDirty default = true).
+    }
+
+    /// Marca el intento como cambiado para el sync futuro. El único cambio posible
+    /// es el juicio del adulto; no se toca `timestamp` (created_at inmutable).
+    func markDirty() {
+        isDirty = true
     }
 }

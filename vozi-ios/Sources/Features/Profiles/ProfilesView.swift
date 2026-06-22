@@ -22,6 +22,7 @@ struct ProfilesView: View {
                     grid
                 }
             }
+            .voziBackground()
             .navigationTitle("¿Quién va a practicar?")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
@@ -80,14 +81,19 @@ struct ProfilesView: View {
     }
 
     private var emptyState: some View {
-        ContentUnavailableView {
-            Label("Aún no hay perfiles", systemImage: "person.crop.circle.badge.plus")
-        } description: {
-            Text("Crea un perfil para empezar a practicar.")
-        } actions: {
-            Button("Crear perfil") { showingNew = true }
-                .buttonStyle(.borderedProminent)
+        VStack {
+            Spacer()
+            VoziEmptyState(
+                symbol: "person.crop.circle.badge.plus",
+                title: "Aún no hay perfiles",
+                message: "Crea un perfil para empezar a practicar.",
+                color: VoziTheme.mint,
+                actionTitle: "Crear perfil",
+                action: { showingNew = true }
+            )
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func delete(_ profile: ChildProfile) {
@@ -103,21 +109,22 @@ private struct ProfileTile: View {
 
     var body: some View {
         let avatar = AvatarCatalog.option(for: profile.avatarKey)
-        VStack(spacing: 12) {
-            Image(systemName: avatar.symbol)
-                .font(.system(size: 44))
-                .foregroundStyle(avatar.tint)
-                .frame(width: 96, height: 96)
-                .background(avatar.tint.opacity(0.15), in: Circle())
+        VStack(spacing: VoziTheme.Space.md) {
+            VoziHeroIcon(symbol: avatar.symbol, color: avatar.tint, size: 88)
             Text(profile.name)
-                .font(.headline)
+                .font(.vozi(.title3, weight: .bold))
+                .foregroundStyle(VoziTheme.ink)
                 .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text("\(profile.ageBand.rawValue) años")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.vozi(.subheadline, weight: .semibold))
+                .foregroundStyle(avatar.tint)
+                .padding(.vertical, 4)
+                .padding(.horizontal, 12)
+                .background(avatar.tint.opacity(0.15), in: Capsule())
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .padding(.vertical, VoziTheme.Space.lg)
+        .voziCard()
     }
 }

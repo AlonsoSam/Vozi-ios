@@ -6,6 +6,10 @@ import SwiftData
 /// de Palabras. Texto mínimo y botones grandes (spec §11).
 struct ChildHomeView: View {
     let profile: ChildProfile
+    @EnvironmentObject private var premium: PremiumStore
+
+    /// Se muestra la pantalla de planes al tocar un fonema bloqueado por Premium.
+    @State private var showPremium = false
 
     private let columns = [GridItem(.adaptive(minimum: 150), spacing: 20)]
 
@@ -32,11 +36,14 @@ struct ChildHomeView: View {
             }
             .padding(20)
         }
-        .background(VoziTheme.background.ignoresSafeArea())
+        .voziBackground()
         .navigationTitle("¡Hola, \(profile.name)!")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: StageProgress.self) { stageProgress in
             ExerciseView(stageProgress: stageProgress)
+        }
+        .sheet(isPresented: $showPremium) {
+            PremiumView()
         }
     }
 
@@ -45,34 +52,35 @@ struct ChildHomeView: View {
         NavigationLink {
             RewardsView(profile: profile)
         } label: {
-            HStack(spacing: 14) {
+            HStack(spacing: VoziTheme.Space.md) {
                 Image(systemName: "trophy.fill")
                     .font(.title2)
                     .foregroundStyle(.white)
-                    .frame(width: 52, height: 52)
-                    .background(
-                        LinearGradient(colors: [VoziTheme.sunshine, VoziTheme.peach],
-                                       startPoint: .topLeading, endPoint: .bottomTrailing),
-                        in: Circle()
-                    )
+                    .frame(width: 54, height: 54)
+                    .background(VoziTheme.premiumGradient, in: Circle())
+                    .shadow(color: VoziTheme.sunshine.opacity(0.4), radius: 7, x: 0, y: 4)
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Mis recompensas")
-                        .font(.system(.headline, design: .rounded))
-                        .foregroundStyle(.primary)
-                    Text("\(profile.points) puntos · \(unlockedSkins)/\(SkinCatalog.all.count) personajes")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.vozi(.headline, weight: .bold))
+                        .foregroundStyle(VoziTheme.ink)
+                    HStack(spacing: 8) {
+                        Label("\(profile.points)", systemImage: "star.fill")
+                            .foregroundStyle(VoziTheme.sunshine)
+                        Label("\(unlockedSkins)/\(SkinCatalog.all.count)", systemImage: "sparkles")
+                            .foregroundStyle(VoziTheme.mint)
+                    }
+                    .font(.vozi(.subheadline, weight: .semibold))
                 }
 
                 Spacer()
 
                 Image(systemName: "chevron.right")
                     .font(.headline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(VoziTheme.inkSoft)
             }
-            .padding(16)
-            .voziCard(cornerRadius: 22)
+            .padding(VoziTheme.Space.md)
+            .voziCard()
         }
         .buttonStyle(VoziPressableStyle())
         .accessibilityLabel("Mis recompensas. \(profile.points) puntos, \(unlockedSkins) de \(SkinCatalog.all.count) personajes.")
@@ -85,17 +93,27 @@ struct ChildHomeView: View {
 
     @ViewBuilder
     private func tile(for progress: PhonemeProgress) -> some View {
-        // No bloqueado (o modo desarrollador): entra directo a la práctica de
-        // palabras. El progreso real no se altera; solo se evita el candado.
-        let unlocked = progress.status != .locked || DeveloperSettings.isDeveloperModeEnabled
-        if unlocked, let stage = wordsStage(progress) {
-            NavigationLink(value: stage) {
-                PhonemeTile(progress: progress,
-                            forceUnlocked: DeveloperSettings.isDeveloperModeEnabled)
+        // Gate Premium (Fase 6): en modo gratuito solo R está disponible; los demás
+        // fonemas/grupos se ven bloqueados por Premium. El modo desarrollador y el
+        // Premium activo ignoran este bloqueo. NO altera el progreso ni la evaluación.
+        if !premium.canAccess(progress.phoneme) {
+            Button { showPremium = true } label: {
+                PhonemeTile(progress: progress, premiumLocked: true)
             }
             .buttonStyle(VoziPressableStyle())
         } else {
-            PhonemeTile(progress: progress)
+            // Accesible por Premium/gratuito/dev: aplica el desbloqueo normal por
+            // progreso. El modo desarrollador evita el candado de progreso en la UI.
+            let unlocked = progress.status != .locked || DeveloperSettings.isDeveloperModeEnabled
+            if unlocked, let stage = wordsStage(progress) {
+                NavigationLink(value: stage) {
+                    PhonemeTile(progress: progress,
+                                forceUnlocked: DeveloperSettings.isDeveloperModeEnabled)
+                }
+                .buttonStyle(VoziPressableStyle())
+            } else {
+                PhonemeTile(progress: progress)
+            }
         }
     }
 }
@@ -106,13 +124,17 @@ private struct PhonemeTile: View {
     let progress: PhonemeProgress
     /// En modo desarrollador se muestra desbloqueado aunque el estado sea locked.
     var forceUnlocked: Bool = false
+    /// Bloqueado por Premium (Fase 6): se ve distinto al candado de progreso
+    /// (corona dorada + etiqueta "Premium" en vez de candado gris).
+    var premiumLocked: Bool = false
 
     @State private var appeared = false
 
     var body: some View {
         let phoneme = progress.phoneme
-        let locked = progress.status == .locked && !forceUnlocked
-        let completed = progress.status == .completed
+        let locked = progress.status == .locked && !forceUnlocked && !premiumLocked
+        let completed = progress.status == .completed && !premiumLocked
+        let dimmed = locked || premiumLocked
         let color = phoneme.map(VoziTheme.color(for:)) ?? VoziTheme.sky
 
         VStack(spacing: 14) {
@@ -120,31 +142,47 @@ private struct PhonemeTile: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            colors: locked
-                                ? [Color(.systemGray3), Color(.systemGray4)]
-                                : [color, color.opacity(0.72)],
+                            colors: premiumLocked
+                                ? [VoziTheme.sunshine, VoziTheme.peach]
+                                : (locked
+                                    ? [Color(.systemGray3), Color(.systemGray4)]
+                                    : [color, color.opacity(0.72)]),
                             startPoint: .topLeading, endPoint: .bottomTrailing
                         )
                     )
                     .frame(width: 96, height: 96)
-                    .shadow(color: (locked ? Color.black.opacity(0.12) : color.opacity(0.45)),
+                    .shadow(color: (dimmed ? Color.black.opacity(0.12) : color.opacity(0.45)),
                             radius: 9, x: 0, y: 5)
 
                 Image(systemName: phoneme?.iconSystemName ?? "questionmark")
                     .font(.system(size: 42, weight: .semibold))
                     .foregroundStyle(.white)
+                    .opacity(premiumLocked ? 0.85 : 1)
             }
-            .overlay(alignment: .bottomTrailing) { statusBadge(locked: locked, completed: completed) }
+            .overlay(alignment: .bottomTrailing) {
+                statusBadge(locked: locked, completed: completed, premiumLocked: premiumLocked)
+            }
 
             Text(phoneme?.displayName ?? "—")
-                .font(.system(.title2, design: .rounded).bold())
-                .foregroundStyle(locked ? Color.secondary : color)
+                .font(.vozi(.title2, weight: .bold))
+                .foregroundStyle(premiumLocked ? VoziTheme.peach : (locked ? VoziTheme.inkSoft : color))
+
+            // Etiqueta de estado bajo el nombre, unificada con el resto de la app.
+            if premiumLocked {
+                VoziStatusChip(status: .lockedPremium)
+            } else if completed {
+                VoziStatusChip(status: .completed)
+            } else if locked {
+                VoziStatusChip(status: .lockedProgress)
+            } else {
+                VoziStatusChip(status: .available)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 22)
         .voziCard(cornerRadius: 26)
         .scaleEffect(appeared ? 1 : 0.9)
-        .opacity(appeared ? (locked ? 0.7 : 1) : 0)
+        .opacity(appeared ? (dimmed ? 0.7 : 1) : 0)
         .onAppear {
             guard !appeared else { return }
             if reduceMotion {
@@ -153,27 +191,25 @@ private struct PhonemeTile: View {
                 withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) { appeared = true }
             }
         }
-        .accessibilityLabel(accessibilityText(phoneme: phoneme, locked: locked, completed: completed))
+        .accessibilityLabel(accessibilityText(phoneme: phoneme, locked: locked,
+                                              completed: completed, premiumLocked: premiumLocked))
     }
 
     @ViewBuilder
-    private func statusBadge(locked: Bool, completed: Bool) -> some View {
-        if locked {
-            badgeIcon("lock.fill", .secondary)
+    private func statusBadge(locked: Bool, completed: Bool, premiumLocked: Bool) -> some View {
+        if premiumLocked {
+            VoziIconBadge(symbol: "crown.fill", color: VoziTheme.sunshine)
+        } else if locked {
+            VoziIconBadge(symbol: "lock.fill", color: VoziTheme.neutral)
         } else if completed {
-            badgeIcon("checkmark.circle.fill", VoziTheme.success)
+            VoziIconBadge(symbol: "checkmark.circle.fill", color: VoziTheme.success)
         }
     }
 
-    private func badgeIcon(_ symbol: String, _ color: Color) -> some View {
-        Image(systemName: symbol)
-            .font(.title3)
-            .foregroundStyle(color)
-            .background(Circle().fill(.background))
-    }
-
-    private func accessibilityText(phoneme: Phoneme?, locked: Bool, completed: Bool) -> String {
+    private func accessibilityText(phoneme: Phoneme?, locked: Bool,
+                                   completed: Bool, premiumLocked: Bool) -> String {
         let name = phoneme?.displayName ?? ""
+        if premiumLocked { return "Fonema \(name), bloqueado por Premium" }
         if locked { return "Fonema \(name), bloqueado" }
         if completed { return "Fonema \(name), completado" }
         return "Fonema \(name), disponible"

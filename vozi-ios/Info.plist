@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  VOZI · Info.plist base (Fase 7.1)
+  Solo declara las credenciales Supabase como referencias a build settings, que
+  se resuelven desde LocalSecrets.xcconfig (no versionado). El resto de claves
+  (permisos de micrófono/voz, launch screen, versión) las añade Xcode con
+  GENERATE_INFOPLIST_FILE=YES fusionándolas sobre este archivo.
+-->
+<plist version="1.0">
+<dict>
+	<key>SUPABASE_URL</key>
+	<string>$(SUPABASE_URL)</string>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>$(SUPABASE_ANON_KEY)</string>
+</dict>
+</plist>

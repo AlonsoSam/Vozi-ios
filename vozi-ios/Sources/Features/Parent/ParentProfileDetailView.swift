@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 /// Detalle de progreso de un perfil para el adulto (spec §13):
-/// resumen, progreso por fonema, intentos con juicio adulto y export CSV.
+/// resumen, progreso por fonema e intentos con juicio adulto.
 /// El juicio adulto es la validación final (spec §7); el STT base es solo
 /// coincidencia aproximada.
 struct ParentProfileDetailView: View {
@@ -21,36 +21,66 @@ struct ParentProfileDetailView: View {
 
     var body: some View {
         List {
-            Section("Resumen") {
-                LabeledContent("Intentos", value: "\(profile.attempts.count)")
-                LabeledContent("Tiempo de práctica", value: "\(practiceMinutes) min")
-                LabeledContent("Por validar", value: "\(pendingCount)")
+            Section {
+                HStack(spacing: VoziTheme.Space.sm) {
+                    summaryPill("waveform", "\(profile.attempts.count)", "intentos", VoziTheme.brand)
+                    summaryPill("clock.fill", "\(practiceMinutes)", "min", VoziTheme.mint)
+                    summaryPill("person.fill.checkmark", "\(pendingCount)", "por validar", VoziTheme.almost)
+                }
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .listRowBackground(Color.clear)
+            } header: {
+                sectionHeader("Resumen")
             }
 
-            Section("Progreso por fonema") {
+            Section {
                 ForEach(orderedPhonemes) { pp in
                     phonemeRow(pp)
                 }
+            } header: {
+                sectionHeader("Progreso por fonema")
             }
 
-            Section("Intentos") {
+            Section {
                 if attempts.isEmpty {
-                    Text("Aún no hay intentos.").foregroundStyle(.secondary)
+                    Text("Aún no hay intentos.")
+                        .font(.vozi(.subheadline))
+                        .foregroundStyle(VoziTheme.inkSoft)
                 } else {
                     ForEach(attempts) { attemptRow($0) }
                 }
+            } header: {
+                sectionHeader("Intentos")
             }
         }
+        .scrollContentBackground(.hidden)
+        .voziBackground()
         .navigationTitle(profile.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if !attempts.isEmpty {
-                ShareLink(item: AttemptCSV.make(attempts),
-                          preview: SharePreview("vozi-\(profile.name)-intentos.csv")) {
-                    Label("Exportar CSV", systemImage: "square.and.arrow.up")
-                }
-            }
+    }
+
+    private func sectionHeader(_ text: String) -> some View {
+        Text(text)
+            .font(.vozi(.subheadline, weight: .bold))
+            .foregroundStyle(VoziTheme.ink)
+            .textCase(nil)
+    }
+
+    private func summaryPill(_ symbol: String, _ value: String, _ caption: String, _ color: Color) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text(value)
+                .font(.vozi(.title3, weight: .bold))
+                .foregroundStyle(VoziTheme.ink)
+            Text(caption)
+                .font(.vozi(.caption2))
+                .foregroundStyle(VoziTheme.inkSoft)
         }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, VoziTheme.Space.md)
+        .voziCard(cornerRadius: VoziTheme.Radius.md)
     }
 
     private var orderedPhonemes: [PhonemeProgress] {
@@ -59,33 +89,44 @@ struct ParentProfileDetailView: View {
 
     private func phonemeRow(_ pp: PhonemeProgress) -> some View {
         let stagesDone = pp.stages.filter { $0.status == .completed }.count
-        return HStack {
+        let color = pp.phoneme.map(VoziTheme.color(for:)) ?? VoziTheme.brand
+        return HStack(spacing: VoziTheme.Space.md) {
             Image(systemName: pp.phoneme?.iconSystemName ?? "questionmark")
-                .foregroundStyle(.tint)
-                .frame(width: 28)
-            Text(pp.phoneme?.displayName ?? "—").bold()
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(VoziTheme.gradient(color), in: Circle())
+            Text(pp.phoneme?.displayName ?? "—")
+                .font(.vozi(.headline, weight: .bold))
+                .foregroundStyle(VoziTheme.ink)
             Spacer()
             Text("\(stagesDone)/\(LearningStage.allCases.count) etapas")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.vozi(.subheadline, weight: .medium))
+                .foregroundStyle(VoziTheme.inkSoft)
             if pp.status == .completed {
-                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(VoziTheme.success)
             }
         }
+        .listRowBackground(rowBackground)
     }
 
     private func attemptRow(_ a: SpeechAttempt) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("\(a.targetPhoneme) · \(a.targetWord)").bold()
+                Text("\(a.targetPhoneme) · \(a.targetWord)")
+                    .font(.vozi(.headline, weight: .bold))
+                    .foregroundStyle(VoziTheme.ink)
                 Spacer()
-                Text(a.algorithmPassed ? "AUTO ✓" : "AUTO ✗")
-                    .font(.caption)
-                    .foregroundStyle(a.algorithmPassed ? .green : .orange)
+                Label(a.algorithmPassed ? "Auto ✓" : "Auto ✗", systemImage: "cpu")
+                    .font(.vozi(.caption2, weight: .bold))
+                    .foregroundStyle(a.algorithmPassed ? VoziTheme.success : VoziTheme.almost)
+                    .padding(.vertical, 4).padding(.horizontal, 8)
+                    .background((a.algorithmPassed ? VoziTheme.success : VoziTheme.almost).opacity(0.15),
+                                in: Capsule())
             }
             Text("«\(a.rawTranscription.isEmpty ? "—" : a.rawTranscription)»")
-                .font(.callout)
-                .foregroundStyle(.secondary)
+                .font(.vozi(.callout))
+                .foregroundStyle(VoziTheme.inkSoft)
 
             // Juicio del adulto (validación final).
             Menu {
@@ -96,14 +137,27 @@ struct ParentProfileDetailView: View {
             } label: {
                 Label(a.humanJudgment.isEmpty ? "Validar" : a.humanJudgment,
                       systemImage: "person.fill.checkmark")
-                    .font(.caption)
+                    .font(.vozi(.subheadline, weight: .semibold))
+                    .foregroundStyle(a.humanJudgment.isEmpty ? VoziTheme.brand : VoziTheme.success)
+                    .padding(.vertical, 6).padding(.horizontal, 12)
+                    .background((a.humanJudgment.isEmpty ? VoziTheme.brand : VoziTheme.success).opacity(0.12),
+                                in: Capsule())
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
+        .listRowBackground(rowBackground)
+    }
+
+    /// Fondo de fila tipo tarjeta sobre el degradado VOZI.
+    private var rowBackground: some View {
+        RoundedRectangle(cornerRadius: VoziTheme.Radius.md, style: .continuous)
+            .fill(VoziTheme.cardFill)
+            .padding(.vertical, 3)
     }
 
     private func setJudgment(_ attempt: SpeechAttempt, _ value: String) {
         attempt.humanJudgment = value
+        attempt.markDirty()   // Fase 7.3: juicio del adulto → pendiente de sincronizar.
         try? context.save()
     }
 }

@@ -29,6 +29,7 @@ enum ProgressService {
                               in context: ModelContext) {
         stageProgress.status = .completed
         stageProgress.lastPracticedAt = Date()
+        stageProgress.markDirty()   // Fase 7.3: marca el cambio para el sync futuro.
 
         guard let phonemeProgress = stageProgress.phonemeProgress else {
             try? context.save()
@@ -38,7 +39,11 @@ enum ProgressService {
         // Gamificación: solo con sesión recompensada (≥90% de aciertos).
         if rewarded {
             phonemeProgress.completionCount += 1
-            phonemeProgress.child?.points += pointsPerCompletion
+            phonemeProgress.markDirty()
+            if let child = phonemeProgress.child {
+                child.points += pointsPerCompletion
+                child.markDirty()
+            }
         }
 
         let stages = sortedStages(phonemeProgress.stages)
@@ -50,6 +55,7 @@ enum ProgressService {
         // Fonema completo si todas sus etapas están completas.
         if stages.allSatisfy({ $0.status == .completed }) {
             phonemeProgress.status = .completed
+            phonemeProgress.markDirty()
             unlockNextPhoneme(after: phonemeProgress)
         }
 
@@ -59,13 +65,17 @@ enum ProgressService {
     /// Registra una práctica de etapa (actualiza marca de tiempo) sin completarla.
     static func touch(_ stageProgress: StageProgress, in context: ModelContext) {
         stageProgress.lastPracticedAt = Date()
+        stageProgress.markDirty()
         try? context.save()
     }
 
     // MARK: - Privados
 
     private static func unlock(_ stage: StageProgress) {
-        if stage.status == .locked { stage.status = .available }
+        if stage.status == .locked {
+            stage.status = .available
+            stage.markDirty()
+        }
     }
 
     private static func unlockNextPhoneme(after phonemeProgress: PhonemeProgress) {
@@ -77,7 +87,10 @@ enum ProgressService {
               idx + 1 < phonemes.count else { return }
 
         let next = phonemes[idx + 1]
-        if next.status == .locked { next.status = .available }
+        if next.status == .locked {
+            next.status = .available
+            next.markDirty()
+        }
         if let firstStage = sortedStages(next.stages).first {
             unlock(firstStage)
         }

@@ -28,7 +28,8 @@ struct RewardsView: View {
 
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Personajes")
-                        .font(.system(.title3, design: .rounded).bold())
+                        .font(.vozi(.title3, weight: .bold))
+                        .foregroundStyle(VoziTheme.ink)
                     LazyVGrid(columns: columns, spacing: 22) {
                         ForEach(skins) { skin in
                             SkinCard(
@@ -41,7 +42,7 @@ struct RewardsView: View {
             }
             .padding(20)
         }
-        .background(VoziTheme.background.ignoresSafeArea())
+        .voziBackground()
         .navigationTitle("Mis recompensas")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -61,25 +62,17 @@ struct RewardsView: View {
                 .shadow(color: avatar.tint.opacity(0.4), radius: 8, x: 0, y: 4)
 
             Text(profile.name)
-                .font(.system(.title2, design: .rounded).bold())
+                .font(.vozi(.title2, weight: .bold))
+                .foregroundStyle(VoziTheme.ink)
 
             HStack(spacing: 16) {
-                statPill("star.fill", "\(profile.points) puntos", VoziTheme.sunshine)
-                statPill("trophy.fill", "\(unlockedCount)/\(skins.count)", VoziTheme.mint)
+                VoziStatPill(symbol: "star.fill", text: "\(profile.points) puntos", color: VoziTheme.sunshine)
+                VoziStatPill(symbol: "trophy.fill", text: "\(unlockedCount)/\(skins.count)", color: VoziTheme.mint)
             }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 22)
-        .voziCard(cornerRadius: 26)
-    }
-
-    private func statPill(_ symbol: String, _ text: String, _ color: Color) -> some View {
-        Label(text, systemImage: symbol)
-            .font(.headline)
-            .foregroundStyle(color)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(color.opacity(0.16), in: Capsule())
+        .voziCard()
     }
 }
 
@@ -150,25 +143,22 @@ private struct SkinCard: View {
 
     /// Nombre + estado de desbloqueo (debajo de la vitrina).
     private var info: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Text(skin.name)
-                .font(.system(.title3, design: .rounded).bold())
-                .foregroundStyle(unlocked ? .primary : .secondary)
+                .font(.vozi(.title3, weight: .bold))
+                .foregroundStyle(unlocked ? VoziTheme.ink : VoziTheme.inkSoft)
                 .multilineTextAlignment(.center)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
 
             if unlocked {
-                Label("¡Desbloqueado!", systemImage: "sparkles")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(VoziTheme.success)
+                VoziStatusChip(status: .rewardUnlocked)
             } else {
-                VStack(spacing: 6) {
-                    ProgressView(value: clampedProgress)
-                        .tint(skin.color)
+                VStack(spacing: 8) {
+                    VoziProgressBar(value: clampedProgress, color: skin.color)
                     Text("Completa \(displayName) \(skin.requiredCompletions) veces · \(completions)/\(skin.requiredCompletions)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(.vozi(.caption))
+                        .foregroundStyle(VoziTheme.inkSoft)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal, 8)

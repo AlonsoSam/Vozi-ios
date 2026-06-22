@@ -49,6 +49,19 @@ final class ChildProfile {
     /// de propiedad para migración ligera de SwiftData sobre stores previos.
     var points: Int = 0
 
+    // MARK: - Sincronización (Fase 7.3 · sin sync todavía)
+    /// Metadatos mínimos para el sync futuro con Supabase. Por ahora solo existen y
+    /// se mantienen localmente; NO hay push/pull. Defaults a nivel de propiedad para
+    /// migración ligera: filas existentes quedan `isDirty = true` (nada sincronizado
+    /// aún) con `updatedAt` antiguo, listas para el primer push cuando llegue el sync.
+    var updatedAt: Date = Date.distantPast
+    var isDirty: Bool = true
+    /// Borrado lógico (tombstone) para propagar la baja al sincronizar. Espeja
+    /// `children.deleted_at` del backend. nil = activo. Aún NO se usa: el borrado de
+    /// perfil sigue siendo físico (ver nota en ProfilesView); la conversión a
+    /// soft-delete se hará en la fase de sync.
+    var deletedAt: Date?
+
     /// Progreso por fonema. Cascade: borrar el perfil borra su progreso.
     @Relationship(deleteRule: .cascade, inverse: \PhonemeProgress.child)
     var phonemeProgress: [PhonemeProgress] = []
@@ -64,6 +77,13 @@ final class ChildProfile {
         self.ageBandRaw = ageBand.rawValue
         self.avatarKey = avatarKey
         self.createdAt = Date()
+        self.updatedAt = Date()
+    }
+
+    /// Marca el perfil como cambiado para el sync futuro (sella `updatedAt`).
+    func markDirty() {
+        isDirty = true
+        updatedAt = Date()
     }
 
     var ageBand: AgeBand { AgeBand(rawValue: ageBandRaw) ?? .young }
@@ -87,6 +107,11 @@ final class PhonemeProgress {
     /// desbloqueo de skins. Default a nivel de propiedad para migración ligera.
     var completionCount: Int = 0
 
+    // MARK: - Sincronización (Fase 7.3 · sin sync todavía)
+    var updatedAt: Date = Date.distantPast
+    var isDirty: Bool = true
+    var deletedAt: Date?
+
     var child: ChildProfile?
 
     /// Avance de las etapas de este fonema (MVP: solo Palabras). Cascade desde el fonema.
@@ -97,6 +122,13 @@ final class PhonemeProgress {
         self.id = UUID()
         self.phonemeCode = phonemeCode
         self.statusRaw = status.rawValue
+        self.updatedAt = Date()
+    }
+
+    /// Marca este avance como cambiado para el sync futuro (sella `updatedAt`).
+    func markDirty() {
+        isDirty = true
+        updatedAt = Date()
     }
 
     var phoneme: Phoneme? { Phoneme(rawValue: phonemeCode) }
@@ -115,6 +147,11 @@ final class StageProgress {
     var itemsCompleted: Int
     var lastPracticedAt: Date?
 
+    // MARK: - Sincronización (Fase 7.3 · sin sync todavía)
+    var updatedAt: Date = Date.distantPast
+    var isDirty: Bool = true
+    var deletedAt: Date?
+
     var phonemeProgress: PhonemeProgress?
 
     init(stage: LearningStage, status: ProgressStatus, itemsCompleted: Int = 0) {
@@ -123,6 +160,13 @@ final class StageProgress {
         self.statusRaw = status.rawValue
         self.itemsCompleted = itemsCompleted
         self.lastPracticedAt = nil
+        self.updatedAt = Date()
+    }
+
+    /// Marca esta etapa como cambiada para el sync futuro (sella `updatedAt`).
+    func markDirty() {
+        isDirty = true
+        updatedAt = Date()
     }
 
     var stage: LearningStage? { LearningStage(rawValue: stageRaw) }

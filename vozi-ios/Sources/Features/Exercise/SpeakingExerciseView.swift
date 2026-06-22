@@ -48,7 +48,7 @@ struct SpeakingExerciseView: View {
             // Solo rebota/scrollea cuando el contenido realmente excede el viewport.
             .scrollBounceBehavior(.basedOnSize)
         }
-        .background(VoziTheme.background.ignoresSafeArea())
+        .voziBackground()
         .navigationBarBackButtonHidden(vm.isRecording)
         .onDisappear { vm.stopAll() }
     }
@@ -102,12 +102,18 @@ struct SpeakingExerciseView: View {
     }
 
     private var counterPill: some View {
-        Text("\(vm.index + 1) de \(vm.totalItems)")
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(color)
-            .padding(.vertical, 6)
-            .padding(.horizontal, 16)
-            .background(color.opacity(0.14), in: Capsule())
+        // Progreso de la sesión: pill con contador + mini barra para ubicar al niño.
+        VStack(spacing: 8) {
+            Label("\(vm.index + 1) de \(vm.totalItems)", systemImage: "checklist")
+                .font(.vozi(.subheadline, weight: .bold))
+                .foregroundStyle(color)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 16)
+                .background(color.opacity(0.14), in: Capsule())
+            VoziProgressBar(value: Double(vm.index + 1) / Double(max(vm.totalItems, 1)),
+                            color: color, height: 8)
+                .frame(maxWidth: 200)
+        }
     }
 
     // MARK: - Botón Hablar (circular, con pulso al grabar)
@@ -135,8 +141,8 @@ struct SpeakingExerciseView: View {
             .frame(height: 130)
 
             Text(vm.isRecording ? "Te escucho…" : "Toca y dilo en voz alta")
-                .font(.callout.weight(.medium))
-                .foregroundStyle(.secondary)
+                .font(.vozi(.callout, weight: .semibold))
+                .foregroundStyle(vm.isRecording ? .red : VoziTheme.inkSoft)
         }
     }
 
@@ -155,7 +161,7 @@ struct SpeakingExerciseView: View {
             FeedbackIcon(success: success, reduceMotion: reduceMotion)
 
             Text(title)
-                .font(.system(.title2, design: .rounded).bold())
+                .font(.vozi(.title2, weight: .bold))
                 .foregroundStyle(success ? VoziTheme.success : VoziTheme.almost)
                 .multilineTextAlignment(.center)
 
@@ -199,14 +205,21 @@ struct SpeakingExerciseView: View {
             FeedbackIcon(success: earned, reduceMotion: reduceMotion, size: 84)
 
             Text(earned ? "¡Práctica completada!" : "¡Buen intento!")
-                .font(.system(.largeTitle, design: .rounded).bold())
+                .font(.vozi(.largeTitle, weight: .heavy))
+                .foregroundStyle(VoziTheme.ink)
                 .multilineTextAlignment(.center)
 
+            if earned {
+                VoziStatPill(symbol: "star.fill",
+                             text: "+\(ProgressService.pointsPerCompletion) puntos",
+                             color: VoziTheme.sunshine)
+            }
+
             Text(earned
-                 ? "¡Ganaste \(ProgressService.pointsPerCompletion) puntos! Acertaste \(vm.passedCount) de \(vm.totalItems)."
+                 ? "Acertaste \(vm.passedCount) de \(vm.totalItems). ¡Sigue así!"
                  : "Buen intento, practiquemos un poco más para ganar la recompensa.")
-                .font(.headline)
-                .foregroundStyle(.secondary)
+                .font(.vozi(.headline, weight: .medium))
+                .foregroundStyle(VoziTheme.inkSoft)
                 .multilineTextAlignment(.center)
 
             Spacer(minLength: 24)
